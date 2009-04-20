@@ -82,11 +82,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     actionPaste->setEnabled(!QApplication::clipboard()->text().isEmpty());
 
+    //setup filebrowser
     splitter = new QSplitter;
     dirmodel = new QDirModel;
     filebrowser = new QListView(splitter);
     filebrowser->setModel(dirmodel);
-    filebrowser->setRootIndex(dirmodel->index(QDir::currentPath()));
+    filebrowser->setRootIndex(dirmodel->index(QDir::currentPath()+tr("\\..")));
     connect(filebrowser, SIGNAL(doubleClicked(const QModelIndex &)),
                 SLOT(loadFromBrowser(const QModelIndex &)));
 
@@ -95,7 +96,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setCentralWidget(splitter);
 
-    //Test slot!!!
+    //Test slot!!! (write now it retracts/opens the filebrowser)
     testbool = false;
     a = new QAction(tr("&Klose"), this);
     a->setShortcut(Qt::CTRL + Qt::Key_K);
@@ -128,7 +129,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 void MainWindow::loadFromBrowser(const QModelIndex &index)
 {
-    load(dirmodel->fileName(index));
+    if (!load(dirmodel->filePath(index)))
+        printf("failed to load from file browser widget\n");
 }
 
 void MainWindow::testSlot()
@@ -164,11 +166,7 @@ void MainWindow::fileOpen() //slot
 {
     QString fileName = QFileDialog::getOpenFileName(this, tr("Open File"),
             QString(), tr("Text Files (*.txt);;C++ Files (*.cpp *.h);;All Files (*)"));
-    if (load(fileName))
-    {
-        tabArea->setTabText(tabArea->currentIndex(),
-                QFileInfo(fileName).fileName());//slist.last());
-    }
+    load(fileName);
 }
 
 
@@ -197,6 +195,7 @@ bool MainWindow::fileSaveAs() //slot
     //QStringList slist = fileName.split("/");
     tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());//slist.last());
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
+    
     return true;
 }
 
@@ -219,14 +218,19 @@ bool MainWindow::load(const QString &fileName)
 {
     if (fileName.isNull())
         return false;
+    
     if (!QFile::exists(fileName))
+    {
+        printf("fileName(%s) doesn't exist!\n",fileName.toAscii().constData());
         return false;
+    }
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text))
         return false;
     NoteBox *current = (NoteBox*)tabArea->currentWidget();
     current->textEdit()->setPlainText(file.readAll());
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
+    tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());
     return true;
 }
 
