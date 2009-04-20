@@ -92,6 +92,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
                 SLOT(loadFromBrowser(const QModelIndex &)));
 
     tabArea = new QTabWidget(splitter);
+    tabArea->setMovable(true);
     splitter->setCollapsible(1, false);
 
     setCentralWidget(splitter);
@@ -192,8 +193,7 @@ bool MainWindow::fileSaveAs() //slot
     ts << current->textEdit()->toPlainText();
     current->textEdit()->document()->setModified(false);
 
-    //QStringList slist = fileName.split("/");
-    tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());//slist.last());
+    tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
     
     return true;
@@ -201,7 +201,21 @@ bool MainWindow::fileSaveAs() //slot
 
 void MainWindow::closeTab()
 {
-    tabArea->removeTab(tabArea->currentIndex());
+    if (tabArea->count() > 1)
+    {
+        tabArea->removeTab(tabArea->currentIndex());
+    }
+    else
+    {
+        int tabIndex = tabArea->currentIndex();
+        QString title = tabArea->tabText(tabIndex);
+        NoteBox *current = (NoteBox*)tabArea->currentWidget();
+        if(!title.startsWith("*Untitled") || title.endsWith(" +"))
+        {
+            current->textEdit()->clear();
+            tabArea->setTabText(tabArea->currentIndex(),tr("*Untitled")+QString::number(++tabinc));
+        }
+    }
 }
 
 void MainWindow::switchTab()
@@ -216,6 +230,13 @@ void MainWindow::switchTab()
 
 bool MainWindow::load(const QString &fileName)
 {
+    NoteBox *current = (NoteBox*)tabArea->currentWidget();
+
+    if (current == 0)
+    {
+        printf("loading null widget, fail\n");
+        return false;
+    }
     if (fileName.isNull())
         return false;
     
@@ -227,7 +248,7 @@ bool MainWindow::load(const QString &fileName)
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text))
         return false;
-    NoteBox *current = (NoteBox*)tabArea->currentWidget();
+    
     current->textEdit()->setPlainText(file.readAll());
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
     tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());
