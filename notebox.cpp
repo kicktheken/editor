@@ -64,7 +64,7 @@ NoteBox::NoteBox(QWidget *parent) : QFrame(parent)
     highlighter = new Highlighter(view->document());
 
     // Setup the line number pane
-    numbers = new NumberBar( this );
+    numbers = new NumberBar(this);
     numbers->setTextEdit(view);
 
     box = new QHBoxLayout(this);
@@ -72,6 +72,7 @@ NoteBox::NoteBox(QWidget *parent) : QFrame(parent)
     box->setMargin(0);
     box->addWidget(numbers);
     box->addWidget(view);
+
 
     connect(view, SIGNAL(cursorPositionChanged()), this, SLOT(highlightCurrentLine()));
     highlightCurrentLine();

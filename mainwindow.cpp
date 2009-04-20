@@ -82,8 +82,26 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     actionPaste->setEnabled(!QApplication::clipboard()->text().isEmpty());
 
-    tabArea = new QTabWidget(this);
-    setCentralWidget(tabArea);
+    splitter = new QSplitter;
+    dirmodel = new QDirModel;
+    filebrowser = new QListView(splitter);
+    filebrowser->setModel(dirmodel);
+    filebrowser->setRootIndex(dirmodel->index(QDir::currentPath()));
+    connect(filebrowser, SIGNAL(doubleClicked(const QModelIndex &)),
+                SLOT(loadFromBrowser(const QModelIndex &)));
+
+    tabArea = new QTabWidget(splitter);
+    splitter->setCollapsible(1, false);
+
+    setCentralWidget(splitter);
+
+    //Test slot!!!
+    testbool = false;
+    a = new QAction(tr("&Klose"), this);
+    a->setShortcut(Qt::CTRL + Qt::Key_K);
+    connect(a, SIGNAL(triggered()), SLOT(testSlot()));
+    menu->addAction(a);
+    testSlot();
 
     //switch tab
     a = new QAction(tr("&Switch"), this);
@@ -106,6 +124,30 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setWindowTitle(tr("Editor"));
 
+}
+
+void MainWindow::loadFromBrowser(const QModelIndex &index)
+{
+    load(dirmodel->fileName(index));
+}
+
+void MainWindow::testSlot()
+{
+    QList<int> list;
+    if (testbool)
+    {
+        list.append(0);
+        list.append(80);
+        splitter->setSizes(list);
+        testbool = false;
+    }
+    else
+    {
+        list.append(50);
+        list.append(50);
+        splitter->setSizes(list);
+        testbool = true;
+    }
 }
 
 void MainWindow::fileNew() //slot

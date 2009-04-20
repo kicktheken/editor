@@ -18,6 +18,8 @@ private slots:
     void closeTab();
     void switchTab();
     void modified(bool changed);
+    void testSlot();
+    void loadFromBrowser(const QModelIndex &index);
 
 private:
     bool load(const QString &fileName);
@@ -30,8 +32,12 @@ private:
     QAction *actionCopy;
     QAction *actionPaste;
 
+    QSplitter *splitter;
+    QDirModel *dirmodel;
+    QListView *filebrowser;
     QTabWidget *tabArea;
     int tabinc;
+    bool testbool;
 };
 
 #endif /* _MAINWINDOW_H */
