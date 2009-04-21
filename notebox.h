@@ -44,6 +44,7 @@ public:
     NoteBox(QWidget *parent=NULL);
     QTextEdit *textEdit() { return view; }
     void setHighlight(bool toggle);
+    QString path;
 
 protected slots:
     void highlightCurrentLine();

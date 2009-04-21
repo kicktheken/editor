@@ -9,6 +9,7 @@ void FileBrowser::setDir(const QString &path)
 {
     
     QDir dir = QDir(path);
+    printf("set dir to (%s)\n",dir.path().toAscii().constData());
     dir.setSorting(QDir::DirsFirst | QDir::Name);
     QList<QFileInfo> list = dir.entryInfoList();
     clear();
@@ -20,7 +21,7 @@ void FileBrowser::setDir(const QString &path)
             if (fileInfo.fileName() == ".")
                 continue;
         }
-        /*else
+        else
         {
             if (fileInfo.suffix() != "txt" &&
                 fileInfo.suffix() != "cpp" &&
@@ -28,7 +29,7 @@ void FileBrowser::setDir(const QString &path)
             {
                 continue;
             }
-        }*/
+        }
         QIcon icon = dirModel.fileIcon(dirModel.index(fileInfo.filePath()));
         QListWidgetItem *item = new QListWidgetItem(icon,fileInfo.fileName(),this);
         item->setData(5,fileInfo.filePath());

@@ -136,8 +136,9 @@ void MainWindow::loadFromBrowser(QListWidgetItem *item)
     {
         filebrowser->setDir(fileInfo.filePath());
     }
-    else if (load(fileInfo.filePath()))
+    else
     {
+        load(fileInfo.filePath());
     }
 }
 
@@ -220,6 +221,7 @@ void MainWindow::closeTab()
         if(!title.startsWith("*Untitled") || title.endsWith(" +"))
         {
             current->textEdit()->clear();
+            current->path = QString();
             tabArea->setTabText(tabArea->currentIndex(),tr("*Untitled")+QString::number(++tabinc));
         }
     }
@@ -258,8 +260,21 @@ bool MainWindow::load(const QString &fileName)
         printf("fileName(%s) failed to open\n",fileName.toAscii().constData());
         return false;
     }
-    
+    QString title = tabArea->tabText(tabArea->currentIndex());
+    if(!title.startsWith("*Untitled") || title.endsWith(" +"))
+    {
+        //I have to reinitialize this b/c of behind the scene slot connect in Qt
+        NoteBox *box = new NoteBox(tabArea);
+        QTextEdit *edit = box->textEdit();
+        tabArea->addTab(box,tr("*Untitled")+QString::number(++tabinc));
+        connect(edit->document(),SIGNAL(modificationChanged(bool)), 
+                SLOT(modified(bool)));
+        tabArea->setCurrentWidget(box);
+        edit->setFocus();
+        current = (NoteBox*)tabArea->currentWidget();
+    }
     current->textEdit()->setPlainText(file.readAll());
+    current->path = fileName;
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
     tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());
     return true;
@@ -268,7 +283,6 @@ bool MainWindow::load(const QString &fileName)
 void MainWindow::modified(bool changed)
 {
     int index = tabArea->currentIndex();
-    //setWindowTitle(tr("WTF"));
     if (changed)
     {
         tabArea->setTabText(index,tabArea->tabText(index)+tr(" +"));
