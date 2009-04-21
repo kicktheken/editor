@@ -1,6 +1,7 @@
 #ifndef _MAINWINDOW_H
 #define _MAINWINDOW_H
 
+#include "filebrowser.h"
 #include <QtGui>
 
 class MainWindow : public QMainWindow
@@ -19,7 +20,7 @@ private slots:
     void switchTab();
     void modified(bool changed);
     void testSlot();
-    void loadFromBrowser(const QModelIndex &index);
+    void loadFromBrowser(QListWidgetItem *item);
 
 private:
     bool load(const QString &fileName);
@@ -33,8 +34,7 @@ private:
     QAction *actionPaste;
 
     QSplitter *splitter;
-    QDirModel *dirmodel;
-    QListView *filebrowser;
+    FileBrowser *filebrowser;
     QTabWidget *tabArea;
     int tabinc;
     bool testbool;

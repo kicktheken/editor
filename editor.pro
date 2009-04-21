@@ -7,8 +7,8 @@ win32:debug {
 }
 
 # Input
-HEADERS += mainwindow.h notebox.h highlighter.h
-SOURCES += mainwindow.cpp main.cpp notebox.cpp highlighter.cpp
+HEADERS += mainwindow.h notebox.h highlighter.h filebrowser.h
+SOURCES += mainwindow.cpp main.cpp notebox.cpp highlighter.cpp filebrowser.cpp
 
 
 

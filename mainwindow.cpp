@@ -84,12 +84,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     //setup filebrowser
     splitter = new QSplitter;
-    dirmodel = new QDirModel;
-    filebrowser = new QListView(splitter);
-    filebrowser->setModel(dirmodel);
-    filebrowser->setRootIndex(dirmodel->index(QDir::currentPath()+tr("\\..")));
-    connect(filebrowser, SIGNAL(doubleClicked(const QModelIndex &)),
-                SLOT(loadFromBrowser(const QModelIndex &)));
+    //dirmodel = new QDirModel;
+    filebrowser = new FileBrowser(splitter);
+    //filebrowser->setModel(dirmodel);
+    //filebrowser->setRootIndex(dirmodel->index(QDir::currentPath()+tr("\\..")));
+    //filebrowser->setMovement(QListView::Snap);
+    connect(filebrowser, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+                SLOT(loadFromBrowser(QListWidgetItem*)));
 
     tabArea = new QTabWidget(splitter);
     tabArea->setMovable(true);
@@ -128,10 +129,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 }
 
-void MainWindow::loadFromBrowser(const QModelIndex &index)
+void MainWindow::loadFromBrowser(QListWidgetItem *item)
 {
+    /*
     if (!load(dirmodel->filePath(index)))
         printf("failed to load from file browser widget\n");
+    else
+    {
+        QPalette pal = palette();
+        //pal.setColor(QPalette::Active, QPalette::Window, Qt::cyan);
+        //pal.setColor(QPalette::Active, QPalette::WindowText, Qt::cyan);
+        pal.setColor(QPalette::Active, QPalette::Base, Qt::cyan);
+        //pal.setColor(QPalette::Active, QPalette::Highlight, Qt::cyan);
+        //pal.setColor(QPalette::Active, QPalette::HighlightedText, Qt::cyan);
+        //printf("set color\n");
+        QWidget *widget = filebrowser;//->indexWidget(index);
+        printf("widget\n");
+        widget->setPalette(pal);
+        printf("palette\n");
+    }*/
 }
 
 void MainWindow::testSlot()
