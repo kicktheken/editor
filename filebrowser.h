@@ -8,8 +8,9 @@ class FileBrowser : public QListWidget
     Q_OBJECT;
 public:
     FileBrowser(QWidget *parent=NULL);
+    void setDir(const QString &path);
 private:
-    QString filter;
+    QDirModel dirModel;
 };
 
 #endif /* _FILEBROWSER_H */

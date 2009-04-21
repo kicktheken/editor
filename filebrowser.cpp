@@ -2,13 +2,36 @@
 
 FileBrowser::FileBrowser(QWidget *parent) : QListWidget(parent)
 {
-    QDirModel dirmodel;
-    QList<QFileInfo> list = QDir::current().entryInfoList();
+    setDir(QDir::currentPath());
+}
+
+void FileBrowser::setDir(const QString &path)
+{
+    
+    QDir dir = QDir(path);
+    dir.setSorting(QDir::DirsFirst | QDir::Name);
+    QList<QFileInfo> list = dir.entryInfoList();
+    clear();
     while (!list.isEmpty())
     {
-        QFileInfo fileinfo = list.takeFirst();
-        QIcon icon = dirmodel.iconProvider()->icon(fileinfo);
-        QListWidgetItem *item = new QListWidgetItem(icon,fileinfo.fileName(),this);
+        QFileInfo fileInfo = list.takeFirst();
+        if (fileInfo.isDir())
+        {
+            if (fileInfo.fileName() == ".")
+                continue;
+        }
+        /*else
+        {
+            if (fileInfo.suffix() != "txt" &&
+                fileInfo.suffix() != "cpp" &&
+                fileInfo.suffix() != "h")
+            {
+                continue;
+            }
+        }*/
+        QIcon icon = dirModel.fileIcon(dirModel.index(fileInfo.filePath()));
+        QListWidgetItem *item = new QListWidgetItem(icon,fileInfo.fileName(),this);
+        item->setData(5,fileInfo.filePath());
         addItem(item);
     }
 }

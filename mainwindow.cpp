@@ -131,23 +131,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
 void MainWindow::loadFromBrowser(QListWidgetItem *item)
 {
-    /*
-    if (!load(dirmodel->filePath(index)))
-        printf("failed to load from file browser widget\n");
-    else
+    QFileInfo fileInfo = QFileInfo((const QString&)item->data(5));
+    if (fileInfo.isDir())
     {
-        QPalette pal = palette();
-        //pal.setColor(QPalette::Active, QPalette::Window, Qt::cyan);
-        //pal.setColor(QPalette::Active, QPalette::WindowText, Qt::cyan);
-        pal.setColor(QPalette::Active, QPalette::Base, Qt::cyan);
-        //pal.setColor(QPalette::Active, QPalette::Highlight, Qt::cyan);
-        //pal.setColor(QPalette::Active, QPalette::HighlightedText, Qt::cyan);
-        //printf("set color\n");
-        QWidget *widget = filebrowser;//->indexWidget(index);
-        printf("widget\n");
-        widget->setPalette(pal);
-        printf("palette\n");
-    }*/
+        filebrowser->setDir(fileInfo.filePath());
+    }
+    else if (load(fileInfo.filePath()))
+    {
+    }
 }
 
 void MainWindow::testSlot()
@@ -263,7 +254,10 @@ bool MainWindow::load(const QString &fileName)
     }
     QFile file(fileName);
     if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        printf("fileName(%s) failed to open\n",fileName.toAscii().constData());
         return false;
+    }
     
     current->textEdit()->setPlainText(file.readAll());
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
