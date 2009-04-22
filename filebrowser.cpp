@@ -32,7 +32,7 @@ void FileBrowser::setDir(const QString &path)
         }
         QIcon icon = dirModel.fileIcon(dirModel.index(fileInfo.filePath()));
         QListWidgetItem *item = new QListWidgetItem(icon,fileInfo.fileName(),this);
-        item->setData(5,fileInfo.filePath());
+        item->setData(5,fileInfo.canonicalFilePath());
         addItem(item);
     }
 }
