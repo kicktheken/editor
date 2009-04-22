@@ -82,14 +82,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     actionPaste->setEnabled(!QApplication::clipboard()->text().isEmpty());
 
-    //setup filebrowser
+    //setup fileBrowser
     splitter = new QSplitter;
     //dirmodel = new QDirModel;
-    filebrowser = new FileBrowser(splitter);
-    //filebrowser->setModel(dirmodel);
-    //filebrowser->setRootIndex(dirmodel->index(QDir::currentPath()+tr("\\..")));
-    //filebrowser->setMovement(QListView::Snap);
-    connect(filebrowser, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+    fileBrowser = new FileBrowser(splitter);
+    //fileBrowser->setModel(dirmodel);
+    //fileBrowser->setRootIndex(dirmodel->index(QDir::currentPath()+tr("\\..")));
+    //fileBrowser->setMovement(QListView::Snap);
+    connect(fileBrowser, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
                 SLOT(loadFromBrowser(QListWidgetItem*)));
 
     tabArea = new QTabWidget(splitter);
@@ -100,7 +100,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     setCentralWidget(splitter);
 
-    //Test slot!!! (write now it retracts/opens the filebrowser)
+    //Test slot!!! (write now it retracts/opens the fileBrowser)
     testbool = false;
     a = new QAction(tr("&Klose"), this);
     a->setShortcut(Qt::CTRL + Qt::Key_K);
@@ -136,7 +136,8 @@ void MainWindow::loadFromBrowser(QListWidgetItem *item)
     QFileInfo fileInfo = QFileInfo((const QString&)item->data(5));
     if (fileInfo.isDir())
     {
-        filebrowser->setDir(fileInfo.filePath());
+        fileBrowser->setDir(fileInfo.filePath());
+        refreshFileBrowser();
     }
     else
     {
@@ -216,6 +217,7 @@ void MainWindow::closeTab()
     {
         opened.remove(current->path);
         tabArea->removeTab(tabArea->currentIndex());
+        refreshFileBrowser();
     }
     else
     {
@@ -228,6 +230,7 @@ void MainWindow::closeTab()
             current->textEdit()->clear();
             current->path = QString();
             tabArea->setTabText(tabArea->currentIndex(),tr("*Untitled")+QString::number(++tabinc));
+            refreshFileBrowser();
         }
     }
 }
@@ -269,6 +272,7 @@ bool MainWindow::load(const QString &fileName)
     {
         tabArea->setCurrentIndex(opened.value(fileName));
         ((NoteBox*)tabArea->currentWidget())->textEdit()->setFocus();
+        refreshFileBrowser();
         return true;
     }
     QString title = tabArea->tabText(tabArea->currentIndex());
@@ -289,6 +293,7 @@ bool MainWindow::load(const QString &fileName)
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
     tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());
     opened.insert(fileName,tabArea->currentIndex());
+    refreshFileBrowser();
     return true;
 }
 
@@ -309,6 +314,17 @@ void MainWindow::modified(bool changed)
     }
 }
 
-
+void MainWindow::refreshFileBrowser()
+{
+    int count = fileBrowser->count();
+    for (int i=0; i<count; i++)
+    {
+        QListWidgetItem *item = fileBrowser->item(i);
+        if (opened.contains( (const QString&)item->data(5) ))
+            item->setBackground(Qt::yellow);
+        else
+            item->setBackground(Qt::white);
+    }
+}
 
 

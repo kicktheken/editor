@@ -24,7 +24,7 @@ private slots:
 
 private:
     bool load(const QString &fileName);
-    
+    void refreshFileBrowser();
 
     QAction *actionSave;
     QAction *actionUndo;
@@ -34,7 +34,7 @@ private:
     QAction *actionPaste;
 
     QSplitter *splitter;
-    FileBrowser *filebrowser;
+    FileBrowser *fileBrowser;
     QTabWidget *tabArea;
     QHash<QString, int> opened;
     int tabinc;
