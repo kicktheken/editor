@@ -94,6 +94,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 
     tabArea = new QTabWidget(splitter);
     tabArea->setMovable(true);
+    //tabArea->setUsesScrollButtons(false);
+    tabArea->setElideMode(Qt::ElideRight);
     splitter->setCollapsible(1, false);
 
     setCentralWidget(splitter);
@@ -209,17 +211,20 @@ bool MainWindow::fileSaveAs() //slot
 
 void MainWindow::closeTab()
 {
+    NoteBox *current = (NoteBox*)tabArea->currentWidget();
     if (tabArea->count() > 1)
     {
+        opened.remove(current->path);
         tabArea->removeTab(tabArea->currentIndex());
     }
     else
     {
         int tabIndex = tabArea->currentIndex();
         QString title = tabArea->tabText(tabIndex);
-        NoteBox *current = (NoteBox*)tabArea->currentWidget();
+        
         if(!title.startsWith("*Untitled") || title.endsWith(" +"))
         {
+            opened.remove(current->path);
             current->textEdit()->clear();
             current->path = QString();
             tabArea->setTabText(tabArea->currentIndex(),tr("*Untitled")+QString::number(++tabinc));
@@ -260,6 +265,12 @@ bool MainWindow::load(const QString &fileName)
         printf("fileName(%s) failed to open\n",fileName.toAscii().constData());
         return false;
     }
+    if (opened.contains(fileName))
+    {
+        tabArea->setCurrentIndex(opened.value(fileName));
+        ((NoteBox*)tabArea->currentWidget())->textEdit()->setFocus();
+        return true;
+    }
     QString title = tabArea->tabText(tabArea->currentIndex());
     if(!title.startsWith("*Untitled") || title.endsWith(" +"))
     {
@@ -277,6 +288,7 @@ bool MainWindow::load(const QString &fileName)
     current->path = fileName;
     current->setHighlight(fileName.endsWith(".cpp") || fileName.endsWith(".h"));
     tabArea->setTabText(tabArea->currentIndex(),QFileInfo(fileName).fileName());
+    opened.insert(fileName,tabArea->currentIndex());
     return true;
 }
 

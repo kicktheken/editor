@@ -36,6 +36,7 @@ private:
     QSplitter *splitter;
     FileBrowser *filebrowser;
     QTabWidget *tabArea;
+    QHash<QString, int> opened;
     int tabinc;
     bool testbool;
 };
