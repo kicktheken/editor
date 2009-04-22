@@ -3,14 +3,17 @@
 
 #include <QtGui>
 
-class FileBrowser : public QListWidget
+class FileBrowser : public QFrame
 {
     Q_OBJECT;
 public:
     FileBrowser(QWidget *parent=NULL);
     void setDir(const QString &path);
+    QListWidget *view;
 private:
     QDirModel dirModel;
+    QLineEdit *pathEdit;
+    QVBoxLayout *layout;
 };
 
 #endif /* _FILEBROWSER_H */

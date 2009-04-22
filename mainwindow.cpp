@@ -89,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
     //fileBrowser->setModel(dirmodel);
     //fileBrowser->setRootIndex(dirmodel->index(QDir::currentPath()+tr("\\..")));
     //fileBrowser->setMovement(QListView::Snap);
-    connect(fileBrowser, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
+    connect(fileBrowser->view, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
                 SLOT(loadFromBrowser(QListWidgetItem*)));
 
     tabArea = new QTabWidget(splitter);
@@ -316,10 +316,10 @@ void MainWindow::modified(bool changed)
 
 void MainWindow::refreshFileBrowser()
 {
-    int count = fileBrowser->count();
+    int count = fileBrowser->view->count();
     for (int i=0; i<count; i++)
     {
-        QListWidgetItem *item = fileBrowser->item(i);
+        QListWidgetItem *item = fileBrowser->view->item(i);
         if (opened.contains( (const QString&)item->data(5) ))
             item->setBackground(Qt::yellow);
         else
