@@ -10,7 +10,10 @@ public:
     FileBrowser(QWidget *parent=NULL);
     void setDir(const QString &path);
     QListWidget *view;
+private slots:
+    void resolvePath();
 private:
+    QDir curDir;
     QDirModel dirModel;
     QLineEdit *pathEdit;
     QVBoxLayout *layout;
